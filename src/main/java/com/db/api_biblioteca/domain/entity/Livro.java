@@ -1,16 +1,19 @@
 package com.db.api_biblioteca.domain.entity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class Livro {
     private String nome;
     private String ISBD;
     private LocalDate dataDePublicacao;
+    private ArrayList<Autor> autores;
 
-    public Livro(String nome, String ISBD, LocalDate dataDePublicacao) {
+    public Livro(String nome, String ISBD, LocalDate dataDePublicacao,  ArrayList<Autor> autores) {
         this.nome = nome;
         this.ISBD = ISBD;
         this.dataDePublicacao = dataDePublicacao;
+        this.autores = autores;
     }
 
     public String getNome() {
@@ -37,4 +40,11 @@ public class Livro {
         this.dataDePublicacao = dataDePublicacao;
     }
 
+    public ArrayList<Autor> getAutores() {
+        return autores;
+    }
+
+    public void setAutores(ArrayList<Autor> autores) {
+        this.autores = autores;
+    }
 }

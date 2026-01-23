@@ -10,9 +10,8 @@ public class Autor {
     private String CPF;
     private ArrayList<Livro> livros;
 
-    public Autor(String nome, String sexo, LocalDate dataDeNascimento, String CPF) {
+    public Autor(String nome, LocalDate dataDeNascimento, String CPF) {
         this.nome = nome;
-        this.sexo = sexo;
         this.dataDeNascimento = dataDeNascimento;
         this.CPF = CPF;
     }

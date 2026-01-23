@@ -1,10 +1,60 @@
 package com.db.api_biblioteca.domain.entity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class Autor {
     private String nome;
     private String sexo;
     private LocalDate dataDeNascimento;
     private String CPF;
+    private ArrayList<Livro> livros;
+
+    public Autor(String nome, String sexo, LocalDate dataDeNascimento, String CPF) {
+        this.nome = nome;
+        this.sexo = sexo;
+        this.dataDeNascimento = dataDeNascimento;
+        this.CPF = CPF;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getSexo() {
+        return sexo;
+    }
+
+    public void setSexo(String sexo) {
+        this.sexo = sexo;
+    }
+
+    public LocalDate getDataDeNascimento() {
+        return dataDeNascimento;
+    }
+
+    public void setDataDeNascimento(LocalDate dataDeNascimento) {
+        this.dataDeNascimento = dataDeNascimento;
+    }
+
+    public String getCPF() {
+        return CPF;
+    }
+
+    public void setCPF(String CPF) {
+        this.CPF = CPF;
+    }
+
+    public ArrayList<Livro> getLivros() {
+        return livros;
+    }
+
+    public void setLivros(ArrayList<Livro> livros) {
+        this.livros = livros;
+    }
 }
+

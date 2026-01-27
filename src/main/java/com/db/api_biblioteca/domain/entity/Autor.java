@@ -2,8 +2,17 @@ package com.db.api_biblioteca.domain.entity;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+@Entity
+@Table(name = "autor")
 
 public class Autor {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String nome;
     private String sexo;
     private LocalDate dataDeNascimento;
@@ -14,6 +23,10 @@ public class Autor {
         this.nome = nome;
         this.dataDeNascimento = dataDeNascimento;
         this.CPF = CPF;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getNome() {

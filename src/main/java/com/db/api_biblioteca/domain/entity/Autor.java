@@ -25,6 +25,9 @@ public class Autor {
         this.CPF = CPF;
     }
 
+    protected Autor() {
+    }
+
     public Long getId() {
         return id;
     }

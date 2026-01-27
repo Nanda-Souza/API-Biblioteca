@@ -1,5 +1,6 @@
 package com.db.api_biblioteca.controller;
 
+import com.db.api_biblioteca.domain.dto.AutorRequest;
 import com.db.api_biblioteca.domain.dto.AutorResponse;
 import com.db.api_biblioteca.domain.entity.Autor;
 import com.db.api_biblioteca.domain.repository.AutorRepository;
@@ -21,13 +22,12 @@ public class AutorController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AutorResponse>> getAutores() {
+    public ResponseEntity<List<AutorResponse>> listarAutores() {
         return ResponseEntity.ok(autorService.listarAutores());
     }
 
-    /*@PostMapping
-    public ResponseEntity saveAutor(@RequestBody Autor autor) {
-        Autor saveAutor = autorRepository.save(autor);
-        return ResponseEntity.ok(saveAutor);
-    }*/
+    @PostMapping
+    public ResponseEntity<AutorResponse> salvarAutor(@RequestBody AutorRequest autorRequest) {
+        return ResponseEntity.ok(autorService.salvarAutor(autorRequest));
+    }
 }

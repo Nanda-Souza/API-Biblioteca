@@ -1,19 +1,41 @@
 package com.db.api_biblioteca.domain.entity;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "livro")
 
 public class Livro {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String nome;
     private String ISBD;
     private LocalDate dataDePublicacao;
-    private ArrayList<Autor> autores;
 
-    public Livro(String nome, String ISBD, LocalDate dataDePublicacao,  ArrayList<Autor> autores) {
+    @ManyToMany
+    @JoinTable(
+            name = "autor_livro",
+            joinColumns = @JoinColumn(name = "livro_id"),
+            inverseJoinColumns = @JoinColumn(name = "autor_id")
+    )
+    private List<Autor> autores = new ArrayList<>();
+
+    protected Livro() {
+    }
+
+    public Livro(String nome, String ISBD, LocalDate dataDePublicacao) {
         this.nome = nome;
         this.ISBD = ISBD;
         this.dataDePublicacao = dataDePublicacao;
-        this.autores = autores;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getNome() {
@@ -40,11 +62,5 @@ public class Livro {
         this.dataDePublicacao = dataDePublicacao;
     }
 
-    public ArrayList<Autor> getAutores() {
-        return autores;
-    }
 
-    public void setAutores(ArrayList<Autor> autores) {
-        this.autores = autores;
-    }
 }

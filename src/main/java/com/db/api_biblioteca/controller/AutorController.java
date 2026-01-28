@@ -5,6 +5,7 @@ import com.db.api_biblioteca.domain.dto.AutorResponse;
 import com.db.api_biblioteca.domain.entity.Autor;
 import com.db.api_biblioteca.domain.repository.AutorRepository;
 import com.db.api_biblioteca.domain.service.AutorService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ public class AutorController {
     }
 
     @PostMapping
-    public ResponseEntity<AutorResponse> salvarAutor(@RequestBody AutorRequest autorRequest) {
+    public ResponseEntity<AutorResponse> salvarAutor(@RequestBody @Valid AutorRequest autorRequest) {
         return ResponseEntity.ok(autorService.salvarAutor(autorRequest));
     }
 }

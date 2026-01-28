@@ -16,15 +16,17 @@ public class Autor {
     private String nome;
     private String sexo;
     private LocalDate dataDeNascimento;
-    private String CPF;
+
+    @Column(name = "CPF", unique = true, nullable = false)
+    private String cpf;
 
     @ManyToMany(mappedBy = "autores")
     private List<Livro> livros = new ArrayList<>();
 
-    public Autor(String nome, LocalDate dataDeNascimento, String CPF) {
+    public Autor(String nome, LocalDate dataDeNascimento, String cpf) {
         this.nome = nome;
         this.dataDeNascimento = dataDeNascimento;
-        this.CPF = CPF;
+        this.cpf = cpf;
     }
 
     protected Autor() {
@@ -58,12 +60,12 @@ public class Autor {
         this.dataDeNascimento = dataDeNascimento;
     }
 
-    public String getCPF() {
-        return CPF;
+    public String getCpf() {
+        return cpf;
     }
 
-    public void setCPF(String CPF) {
-        this.CPF = CPF;
+    public void setCPF(String cpf) {
+        this.cpf = cpf;
     }
 
     public List<Livro> getLivros() {

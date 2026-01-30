@@ -2,9 +2,9 @@ package com.db.api_biblioteca.domain.entity;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
 @Entity
 @Table(name = "autor")
@@ -16,13 +16,20 @@ public class Autor {
     private String nome;
     private String sexo;
     private LocalDate dataDeNascimento;
-    private String CPF;
-    private ArrayList<Livro> livros;
 
-    public Autor(String nome, LocalDate dataDeNascimento, String CPF) {
+    @Column(name = "CPF", unique = true, nullable = false)
+    private String cpf;
+
+    @ManyToMany(mappedBy = "autores")
+    private List<Livro> livros = new ArrayList<>();
+
+    public Autor(String nome, LocalDate dataDeNascimento, String cpf) {
         this.nome = nome;
         this.dataDeNascimento = dataDeNascimento;
-        this.CPF = CPF;
+        this.cpf = cpf;
+    }
+
+    protected Autor() {
     }
 
     public Long getId() {
@@ -53,19 +60,19 @@ public class Autor {
         this.dataDeNascimento = dataDeNascimento;
     }
 
-    public String getCPF() {
-        return CPF;
+    public String getCpf() {
+        return cpf;
     }
 
-    public void setCPF(String CPF) {
-        this.CPF = CPF;
+    public void setCPF(String cpf) {
+        this.cpf = cpf;
     }
 
-    public ArrayList<Livro> getLivros() {
+    public List<Livro> getLivros() {
         return livros;
     }
 
-    public void setLivros(ArrayList<Livro> livros) {
+    public void setLivros(List<Livro> livros) {
         this.livros = livros;
     }
 }

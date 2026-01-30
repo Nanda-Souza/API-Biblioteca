@@ -2,6 +2,8 @@ package com.db.api_biblioteca.domain.validation;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DataValidator {
 
@@ -15,5 +17,18 @@ public class DataValidator {
         } catch (DateTimeParseException e) {
             return false;
         }
+    }
+
+    public static boolean sexoValido(String data) {
+        List<String> sexosValidos = new ArrayList<>();
+        sexosValidos.add("Masculino");
+        sexosValidos.add("Feminino");
+        sexosValidos.add("Outro");
+
+        if(sexosValidos.contains(data)) {
+            return true;
+        }
+
+        return false;
     }
 }

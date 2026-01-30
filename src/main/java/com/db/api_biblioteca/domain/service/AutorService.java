@@ -33,6 +33,19 @@ public class AutorService {
                 .toList();
     }
 
+    public AutorResponse buscarPorId(Long id) {
+        Autor autor = autorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Autor com Id " + id + " não encontrado"));
+
+        return new AutorResponse(
+                autor.getNome(),
+                autor.getSexo(),
+                autor.getDataDeNascimento().toString(),
+                autor.getCpf(),
+                List.of()
+        );
+    }
+
     public AutorResponse salvarAutor(AutorRequest autorRequest) {
 
         if (autorRepository.existsByCpf(autorRequest.cpf())) {
@@ -44,13 +57,19 @@ public class AutorService {
 
         }
 
+        if (autorRequest.sexo() != null){
+            if(!DataValidator.sexoValido(autorRequest.sexo())){
+                throw new IllegalArgumentException("Sexo inválido. Valores permitidos: Masculino, Feminino ou Outro!");
+            }
+        }
+
         Autor autor = new Autor(
                 autorRequest.nome(),
                 LocalDate.parse(autorRequest.dataDeNascimento()),
                 autorRequest.cpf()
         );
 
-        //autor.setSexo(autorRequest.sexo());
+        autor.setSexo(autorRequest.sexo());
 
         Autor autorSalvo = autorRepository.save(autor);
 

@@ -27,6 +27,13 @@ public class AutorController {
         return ResponseEntity.ok(autorService.listarAutores());
     }
 
+    @GetMapping("/buscar")
+    public ResponseEntity<AutorResponse> buscarAutorPorId(
+            @RequestParam Long id
+    ) {
+        return ResponseEntity.ok(autorService.buscarPorId(id));
+    }
+
     @PostMapping
     public ResponseEntity<AutorResponse> salvarAutor(@RequestBody @Valid AutorRequest autorRequest) {
         return ResponseEntity.ok(autorService.salvarAutor(autorRequest));

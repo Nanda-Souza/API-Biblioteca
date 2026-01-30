@@ -38,4 +38,10 @@ public class AutorController {
     public ResponseEntity<AutorResponse> salvarAutor(@RequestBody @Valid AutorRequest autorRequest) {
         return ResponseEntity.ok(autorService.salvarAutor(autorRequest));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarAutor(@PathVariable Long id) {
+        autorService.deletarAutor(id);
+        return ResponseEntity.noContent().build();
+    }
 }

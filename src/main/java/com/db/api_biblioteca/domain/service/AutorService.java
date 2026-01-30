@@ -78,7 +78,15 @@ public class AutorService {
                 autorSalvo.getSexo(),
                 autorSalvo.getDataDeNascimento().toString(),
                 autorSalvo.getCpf(),
-                List.of() // sem livros por enquanto
+                List.of()
         );
+    }
+
+    public void deletarAutor(Long id) {
+        Autor autor = autorRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Autor com Id " + id + " não encontrado"));
+
+        autorRepository.delete(autor);
     }
 }

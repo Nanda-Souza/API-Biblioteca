@@ -58,7 +58,7 @@ public class AutorService {
         }
 
         if (!DataValidator.dataNascimentoValida(autorRequest.dataDeNascimento())){
-            throw new IllegalArgumentException("Data de nascimento no formato invalido ou no futuro! Favor fornecer data no formato aaaa-mm-dd!");
+            throw new IllegalArgumentException("Data de nascimento no formato inválido ou no futuro! Favor fornecer data no formato aaaa-mm-dd!");
 
         }
 

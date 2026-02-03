@@ -3,6 +3,9 @@ package com.db.api_biblioteca.domain.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
+import java.util.List;
 
 public record LivroRequest (
 
@@ -16,6 +19,10 @@ public record LivroRequest (
         )
         String isbd,
 
-        @NotNull(message = "Data de nascimento é obrigatória!")
-        String dataDeNascimento) {
+        @NotNull(message = "Data de publicação é obrigatória!")
+        String dataDePublicacao,
+
+        @NotNull(message = "O livro deve possuir ao menos um autor!")
+        @Size(min = 1, message = "O livro deve possuir ao menos um autor!")
+        List<Long> autoresIds) {
 }

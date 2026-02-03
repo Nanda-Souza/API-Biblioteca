@@ -42,6 +42,10 @@ public class Livro {
         return nome;
     }
 
+    public List<Autor> getAutores() {
+        return autores;
+    }
+
     public void setNome(String nome) {
         this.nome = nome;
     }

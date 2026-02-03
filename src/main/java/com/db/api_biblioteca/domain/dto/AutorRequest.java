@@ -1,6 +1,5 @@
 package com.db.api_biblioteca.domain.dto;
 
-import java.util.List;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;

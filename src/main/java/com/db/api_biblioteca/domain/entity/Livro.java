@@ -14,7 +14,7 @@ public class Livro {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
-    private String ISBD;
+    private String isbd;
     private LocalDate dataDePublicacao;
 
     @ManyToMany
@@ -28,9 +28,9 @@ public class Livro {
     protected Livro() {
     }
 
-    public Livro(String nome, String ISBD, LocalDate dataDePublicacao) {
+    public Livro(String nome, String isbd, LocalDate dataDePublicacao) {
         this.nome = nome;
-        this.ISBD = ISBD;
+        this.isbd = isbd;
         this.dataDePublicacao = dataDePublicacao;
     }
 
@@ -46,12 +46,12 @@ public class Livro {
         this.nome = nome;
     }
 
-    public String getISBD() {
-        return ISBD;
+    public String getIsbd() {
+        return isbd;
     }
 
-    public void setISBD(String ISBD) {
-        this.ISBD = ISBD;
+    public void setIsbd(String isbd) {
+        this.isbd = isbd;
     }
 
     public LocalDate getDataDePublicacao() {

@@ -201,5 +201,115 @@ public class LivroServiceTest {
         verify(livroRepository, times(1)).findAll();
     }
 
+    @Test
+    @DisplayName("Deve adicionar autor ao livro com sucesso!")
+    void deveAdicionarAutorAoLivroComSucesso() {
+
+        Livro livro = new Livro(
+                "Capitães da Areia",
+                "9788535914849",
+                LocalDate.parse("1937-01-01")
+        );
+
+        Autor autor = new Autor(
+                "Jorge Amado",
+                LocalDate.parse("1912-08-10"),
+                "12345678900"
+        );
+
+        when(livroRepository.findById(1L))
+                .thenReturn(Optional.of(livro));
+
+        when(autorRepository.findById(2L))
+                .thenReturn(Optional.of(autor));
+
+        when(livroRepository.save(any(Livro.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        LivroResponse response = livroService.adicionarAutorAoLivro(1L, 2L);
+
+        assertNotNull(response, "O retorno não pode ser nulo!");
+        assertEquals("Capitães da Areia", response.nome(), "Deve retornar Capitães da Areia!");
+
+        verify(livroRepository).save(livro);
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro quando o livro não existir!")
+    void naoDeveAssociarLivroAoAutorQuandoNaoEncontrarIdDoLivro() {
+
+        when(livroRepository.findById(1L))
+                .thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> livroService.adicionarAutorAoLivro(1L, 2L)
+        );
+
+        assertEquals("Livro com id 1 não encontrado!", exception.getMessage(), "Deve retornar livro com id 1 não encontrado!");
+
+        verify(livroRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro quando o autor não existir!")
+    void naoDeveAssociarLivroAoAutorQuandoNaoEncontrarIdDoAutor() {
+
+        Livro livro = new Livro(
+                "Capitães da Areia",
+                "9788535914849",
+                LocalDate.parse("1937-01-01")
+        );
+
+        when(livroRepository.findById(1L))
+                .thenReturn(Optional.of(livro));
+
+        when(autorRepository.findById(2L))
+                .thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> livroService.adicionarAutorAoLivro(1L, 2L)
+        );
+
+        assertEquals("Autor com id 2 não encontrado!", exception.getMessage(), "Deve retornar livro com id 1 não encontrado!");
+
+        verify(livroRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro quando autor já estiver associado ao livro!")
+    void naoDeveAssociarLivroAoAutorQuandoIdDoAutorJaEstiverAssociado() {
+
+        Autor autor = new Autor(
+                "Jorge Amado",
+                LocalDate.parse("1912-08-10"),
+                "12345678900"
+        );
+
+        Livro livro = new Livro(
+                "Capitães da Areia",
+                "9788535914849",
+                LocalDate.parse("1937-01-01")
+        );
+
+        livro.getAutores().add(autor);
+
+        when(livroRepository.findById(1L))
+                .thenReturn(Optional.of(livro));
+
+        when(autorRepository.findById(2L))
+                .thenReturn(Optional.of(autor));
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> livroService.adicionarAutorAoLivro(1L, 2L)
+        );
+
+        assertEquals("Autor já está associado a este livro!", exception.getMessage(), "Deve retornar que o autor já está associado ao livro!");
+
+        verify(livroRepository, never()).save(any());
+    }
+
 
 }

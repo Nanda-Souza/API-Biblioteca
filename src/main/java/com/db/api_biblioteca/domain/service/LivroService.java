@@ -150,4 +150,22 @@ public class LivroService {
         );
     }
 
+    public LivroResponse buscarLivroPorId(Long id) {
+        Livro livro = livroRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Livro com Id " + id + " não encontrado!")
+                );
+
+        return new LivroResponse(
+                livro.getId(),
+                livro.getNome(),
+                livro.getIsbd(),
+                livro.getDataDePublicacao().toString(),
+                livro.getAutores()
+                        .stream()
+                        .map(Autor::getId)
+                        .toList()
+        );
+    }
+
 }

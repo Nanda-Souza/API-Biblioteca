@@ -25,6 +25,13 @@ public class LivroController {
         return ResponseEntity.ok(livroService.listarLivros());
     }
 
+    @GetMapping("/{livroId}")
+    public ResponseEntity<LivroResponse> buscarLivroPorId(
+            @PathVariable Long livroId
+    ) {
+        return ResponseEntity.ok(livroService.buscarLivroPorId(livroId));
+    }
+
     @PostMapping
     public ResponseEntity<LivroResponse> salvarLivro(
             @RequestBody @Valid LivroRequest livroRequest

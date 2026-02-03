@@ -461,5 +461,51 @@ public class LivroServiceTest {
         verify(livroRepository, never()).save(any());
     }
 
+    @Test
+    @DisplayName("Deve buscar livro por id com sucesso!")
+    void deveBuscarLivroPorIdComSucesso() {
+
+        Autor autor1 = new Autor(
+                "Jorge Amado",
+                LocalDate.parse("1912-08-10"),
+                "12345678900"
+        );
+
+        Livro livro = new Livro(
+                "Capitães da Areia",
+                "9788535914849",
+                LocalDate.parse("1937-01-01")
+        );
+
+        livro.getAutores().add(autor1);
+
+        when(livroRepository.findById(1L))
+                .thenReturn(Optional.of(livro));
+
+        LivroResponse response = livroService.buscarLivroPorId(1L);
+
+        assertNotNull(response, "O retorno não pode ser nulo!");
+        assertEquals("Capitães da Areia", response.nome(), "Deve retornar Capitães da Areia!");
+
+        verify(livroRepository).findById(1L);
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção quando livro não for encontrado")
+    void deveLancarExcecaoQuandoNaoEncontrarLivro() {
+
+        when(livroRepository.findById(1L))
+                .thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> livroService.buscarLivroPorId(1L)
+        );
+
+        assertEquals("Livro com Id 1 não encontrado!", exception.getMessage(), "Deve retornar que o livro com id não foi encontrado!");
+
+        verify(livroRepository).findById(1L);
+    }
+
 
 }

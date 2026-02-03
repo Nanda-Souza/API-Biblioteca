@@ -311,5 +311,155 @@ public class LivroServiceTest {
         verify(livroRepository, never()).save(any());
     }
 
+    @Test
+    @DisplayName("Deve remover autor do livro com sucesso!")
+    void deveRemoverAutorDoLivroComSucesso() {
+
+        Autor autor1 = new Autor(
+                "Jorge Amado",
+                LocalDate.parse("1912-08-10"),
+                "12345678900"
+        );
+
+        Autor autor2 = new Autor(
+                "Machado de Assis",
+                LocalDate.parse("1839-06-21"),
+                "12345678902"
+        );
+
+        Livro livro = new Livro(
+                "Capitães da Areia",
+                "9788535914849",
+                LocalDate.parse("1937-01-01")
+        );
+
+        livro.getAutores().add(autor1);
+        livro.getAutores().add(autor2);
+
+        when(livroRepository.findById(1L)).thenReturn(Optional.of(livro));
+        when(autorRepository.findById(2L)).thenReturn(Optional.of(autor2));
+        when(livroRepository.save(any(Livro.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        LivroResponse response = livroService.removerAutorDoLivro(1L, 2L);
+
+        assertNotNull(response, "O retorno não pode ser nulo!");
+        assertEquals(1, response.autoresIds().size(), "Deve retornar uma lista com apenas 1 id de autor!");
+        assertFalse(response.autoresIds().contains(2L), "Deve retornar o id de autor numero 2!");
+
+        verify(livroRepository).save(livro);
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção quando livro não existir!")
+    void naoDeveRemoverAutorDoLivroQuandoLivroNaoExiste() {
+
+        when(livroRepository.findById(1L))
+                .thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> livroService.removerAutorDoLivro(1L, 2L)
+        );
+
+        assertEquals("Livro com id 1 não encontrado!",exception.getMessage(), "Deve retornar livro com id 1 não encontrado!");
+
+        verify(livroRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção quando autor não existir!")
+    void naoDeveRemoverAutorDoLivroQuandoAutorNaoExiste() {
+
+        Livro livro = new Livro(
+                "Capitães da Areia",
+                "9788535914849",
+                LocalDate.parse("1937-01-01")
+        );
+
+        when(livroRepository.findById(1L))
+                .thenReturn(Optional.of(livro));
+
+        when(autorRepository.findById(2L))
+                .thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> livroService.removerAutorDoLivro(1L, 2L)
+        );
+
+        assertEquals("Autor com id 2 não encontrado!", exception.getMessage(), "Deve retornar autor com id 2 não encontrado!");
+
+        verify(livroRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção quando autor não estiver associado ao livro!")
+    void naoDeveRemoverAutorDoLivroQuandoAutorNaoAssociado() {
+
+        Autor autorAssociado = new Autor(
+                "Jorge Amado",
+                LocalDate.parse("1912-08-10"),
+                "12345678900"
+        );
+
+        Autor autorNaoAssociado = new Autor(
+                "Machado de Assis",
+                LocalDate.parse("1839-06-21"),
+                "12345678902"
+        );
+
+        Livro livro = new Livro(
+                "Capitães da Areia",
+                "9788535914849",
+                LocalDate.parse("1937-01-01")
+        );
+
+        livro.getAutores().add(autorAssociado);
+
+        when(livroRepository.findById(1L)).thenReturn(Optional.of(livro));
+        when(autorRepository.findById(2L)).thenReturn(Optional.of(autorNaoAssociado));
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> livroService.removerAutorDoLivro(1L, 2L)
+        );
+
+        assertEquals("Autor não está associado a este livro!",exception.getMessage(), "Deve retornar que o autor não está associado ao livro!");
+
+        verify(livroRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Não deve permitir remover o último autor do livro!")
+    void naoDeveRemoverUltimoAutorDoLivro() {
+
+        Autor autor = new Autor(
+                "Jorge Amado",
+                LocalDate.parse("1912-08-10"),
+                "12345678900"
+        );
+
+        Livro livro = new Livro(
+                "Capitães da Areia",
+                "9788535914849",
+                LocalDate.parse("1937-01-01")
+        );
+
+        livro.getAutores().add(autor);
+
+        when(livroRepository.findById(1L)).thenReturn(Optional.of(livro));
+        when(autorRepository.findById(2L)).thenReturn(Optional.of(autor));
+
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> livroService.removerAutorDoLivro(1L, 2L)
+        );
+
+        assertEquals("Um livro não pode ficar sem autor, favor excluir o livro!", exception.getMessage(), "Deve retornar que o livro não pode ficar sem autor!");
+
+        verify(livroRepository, never()).save(any());
+    }
+
 
 }

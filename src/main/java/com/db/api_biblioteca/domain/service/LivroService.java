@@ -112,4 +112,42 @@ public class LivroService {
         );
     }
 
+    public LivroResponse removerAutorDoLivro(Long livroId, Long autorId) {
+
+        Livro livro = livroRepository.findById(livroId)
+                .orElseThrow(() ->
+                        new RuntimeException("Livro com id " + livroId + " não encontrado!")
+                );
+
+        Autor autor = autorRepository.findById(autorId)
+                .orElseThrow(() ->
+                        new RuntimeException("Autor com id " + autorId + " não encontrado!")
+                );
+
+        if (!livro.getAutores().contains(autor)) {
+            throw new IllegalArgumentException("Autor não está associado a este livro!");
+        }
+
+        if (livro.getAutores().size() == 1) {
+            throw new IllegalStateException(
+                    "Um livro não pode ficar sem autor, favor excluir o livro!"
+            );
+        }
+
+        livro.getAutores().remove(autor);
+
+        Livro livroAtualizado = livroRepository.save(livro);
+
+        return new LivroResponse(
+                livroAtualizado.getId(),
+                livroAtualizado.getNome(),
+                livroAtualizado.getIsbd(),
+                livroAtualizado.getDataDePublicacao().toString(),
+                livroAtualizado.getAutores()
+                        .stream()
+                        .map(Autor::getId)
+                        .toList()
+        );
+    }
+
 }

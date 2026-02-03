@@ -57,7 +57,7 @@ public class AutorServiceTest {
     }
 
     @Test
-    @DisplayName("Não deve salvar o autor e deve retornar erro de cpf já cadastrado!")
+    @DisplayName("Não deve salvar o autor e deve retornar erro de o cpf já for cadastrado!")
     void naoDeveSalvarAutorComCpfJaCadastrado() {
 
         AutorRequest request = new AutorRequest(

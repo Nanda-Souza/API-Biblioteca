@@ -40,6 +40,8 @@ public class Aluguel {
 
     protected Aluguel() {}
 
+    public Long getId() { return id; }
+
     public LocalDate getDataRetirada() {
         return dataRetirada;
     }

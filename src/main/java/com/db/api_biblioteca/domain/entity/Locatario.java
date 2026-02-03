@@ -17,7 +17,10 @@ public class Locatario {
     private String nome;
     private String Sexo;
     private String telefone;
+
+    @Column(name = "EMAIL", unique = true, nullable = false)
     private String email;
+
     private LocalDate dataDeNascimento;
 
     @Column(name = "CPF", unique = true, nullable = false)

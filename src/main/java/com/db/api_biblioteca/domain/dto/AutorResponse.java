@@ -10,5 +10,5 @@ public record AutorResponse (
         String sexo,
         String dataDeNascimento,
         String cpf,
-        List<Livro> livros){
+        List<Long> livrosIds){
 }

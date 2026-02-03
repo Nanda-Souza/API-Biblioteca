@@ -151,6 +151,7 @@ public class AutorService {
     }
 
     public void deletarAutor(Long id) {
+
         Autor autor = autorRepository.findById(id)
                 .orElseThrow(() ->
                         new RuntimeException("Autor com Id " + id + " não encontrado!"));

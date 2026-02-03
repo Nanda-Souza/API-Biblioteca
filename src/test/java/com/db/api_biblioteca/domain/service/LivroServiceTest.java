@@ -97,8 +97,8 @@ public class LivroServiceTest {
     }
 
     @Test
-    @DisplayName("Não deve salvar o livro e deve retornar erro se o isbd já for cadastrado!")
-    void naoDeveSalvarLivroComIsbdJaCadastrado() {
+    @DisplayName("Não deve salvar o livro e deve retornar erro se o isdn já for cadastrado!")
+    void naoDeveSalvarLivroComIsbnJaCadastrado() {
 
         LivroRequest request = new LivroRequest(
                 "Capitães da Areia",
@@ -114,7 +114,7 @@ public class LivroServiceTest {
         );
         autor.setSexo("Masculino");
 
-        when(livroRepository.existsByIsbd(request.isbd()))
+        when(livroRepository.existsByIsbn(request.isbn()))
                 .thenReturn(true);
 
         IllegalArgumentException exception = assertThrows(
@@ -122,7 +122,7 @@ public class LivroServiceTest {
                 () -> livroService.salvarLivro(request)
         );
 
-        assertEquals("ISBD já cadastrado!", exception.getMessage(), "Deve retornar a mensagem de isbd já cadastrado!");
+        assertEquals("ISBN já cadastrado!", exception.getMessage(), "Deve retornar a mensagem de ISBN já cadastrado!");
         verify(autorRepository, never()).save(any());
     }
 
@@ -566,6 +566,124 @@ public class LivroServiceTest {
         assertEquals("Autor com id 1 não encontrado!", exception.getMessage(), "Deve retornar autor com id 1 não encontrado!");
 
         verify(autorRepository).findById(autorId);
+    }
+
+    @Test
+    @DisplayName("Deve deletar livro e remover associação dos autores!")
+    void deveDeletarLivroComSucesso() {
+
+        // Arrange
+        Livro livro = new Livro(
+                "Capitães da Areia",
+                "9788535914849",
+                LocalDate.parse("1937-01-01")
+        );
+
+        Autor autor1 = new Autor(
+                "Jorge Amado",
+                LocalDate.parse("1912-08-10"),
+                "12345678900"
+        );
+
+        Autor autor2 = new Autor(
+                "Cecília Meireles",
+                LocalDate.parse("1901-11-07"),
+                "12345678906"
+        );
+
+        livro.getAutores().add(autor1);
+        livro.getAutores().add(autor2);
+
+        autor1.getLivros().add(livro);
+        autor2.getLivros().add(livro);
+
+        when(livroRepository.findById(1L))
+                .thenReturn(Optional.of(livro));
+
+        livroService.deletarLivro(1L);
+
+        assertFalse(autor1.getLivros().contains(livro),"O livro deve ser removido da lista do autor 1!");
+        assertFalse(autor2.getLivros().contains(livro),"O livro deve ser removido da lista do autor 2!");
+
+        verify(livroRepository).findById(1L);
+        verify(livroRepository).delete(livro);
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção quando livro não existir!")
+    void deveLancarExcecaoQuandoDeletarLivroNaoEncontrado() {
+
+        when(livroRepository.findById(1L))
+                .thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> livroService.deletarLivro(1L)
+        );
+
+        assertEquals("Livro com id 1 não encontrado!",exception.getMessage(), "Deve retornar livro com id 1 não encontrado!");
+
+        verify(livroRepository, never()).delete(any());
+    }
+
+    @Test
+    @DisplayName("Deve atualizar nome do livro com sucesso!")
+    void deveAtualizarNomeDoLivro() {
+
+        Livro livro = new Livro(
+                "Laços",
+                "9788535914849",
+                LocalDate.parse("1937-01-01")
+        );
+
+        when(livroRepository.findById(1L))
+                .thenReturn(Optional.of(livro));
+
+        when(livroRepository.save(any(Livro.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        LivroUpdateRequest request = new LivroUpdateRequest(
+                "Laços de Família",
+                null,
+                null,
+                null
+        );
+
+        LivroResponse response = livroService.atualizarLivro(1L, request);
+
+        assertEquals("Laços de Família", response.nome(), "Deve retornar Laços de Família!");
+
+        verify(livroRepository).save(livro);
+    }
+
+    @Test
+    @DisplayName("Não deve permitir atualizar livro sem autor!")
+    void naoDeveAtualizarLivroSemAutor() {
+
+        Livro livro = new Livro(
+                "Laços de Família",
+                "9788535914849",
+                LocalDate.parse("1937-01-01")
+        );
+
+        when(livroRepository.findById(1L))
+                .thenReturn(Optional.of(livro));
+
+        LivroUpdateRequest request = new LivroUpdateRequest(
+                null,
+                null,
+                null,
+                List.of()
+        );
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> livroService.atualizarLivro(1L, request)
+        );
+
+        assertEquals("Livro deve possuir ao menos um autor!", exception.getMessage(),"Deve retornar que o livro deve possuir ao menos 1 autor!");
+
+        verify(livroRepository, never()).save(any());
     }
 
 

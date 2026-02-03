@@ -3,6 +3,7 @@ package com.db.api_biblioteca.controller;
 import com.db.api_biblioteca.domain.dto.LivroRequest;
 import com.db.api_biblioteca.domain.dto.LivroResponse;
 import com.db.api_biblioteca.domain.dto.LivroPorAutorResponse;
+import com.db.api_biblioteca.domain.dto.LivroUpdateRequest;
 import com.db.api_biblioteca.domain.service.LivroService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +68,20 @@ public class LivroController {
                 livroService.removerAutorDoLivro(livroId, autorId);
 
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{livroId}")
+    public ResponseEntity<Void> deletarLivroPorId(@PathVariable Long livroId) {
+        livroService.deletarLivro(livroId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("{livroId}")
+    public ResponseEntity<LivroResponse> atualizarLivro(
+            @PathVariable Long livroId,
+            @RequestBody @Valid LivroUpdateRequest livroRequest
+    ){
+        return ResponseEntity.ok(livroService.atualizarLivro(livroId, livroRequest));
     }
 
 }

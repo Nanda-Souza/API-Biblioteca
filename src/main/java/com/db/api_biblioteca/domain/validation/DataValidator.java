@@ -19,6 +19,15 @@ public class DataValidator {
         }
     }
 
+    public static boolean dataDePublicacaoValida(String data) {
+        try {
+            LocalDate dataDePublicacao = LocalDate.parse(data);
+            return true;
+        } catch (DateTimeParseException e) {
+            return false;
+        }
+    }
+
     public static boolean sexoValido(String data) {
         List<String> sexosValidos = new ArrayList<>();
         sexosValidos.add("Masculino");

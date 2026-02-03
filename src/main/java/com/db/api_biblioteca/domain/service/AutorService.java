@@ -4,6 +4,7 @@ import com.db.api_biblioteca.domain.dto.AutorRequest;
 import com.db.api_biblioteca.domain.dto.AutorResponse;
 import com.db.api_biblioteca.domain.dto.AutorUpdateRequest;
 import com.db.api_biblioteca.domain.entity.Autor;
+import com.db.api_biblioteca.domain.entity.Livro;
 import com.db.api_biblioteca.domain.repository.AutorRepository;
 import com.db.api_biblioteca.domain.validation.DataValidator;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,10 @@ public class AutorService {
                         autor.getSexo(),
                         autor.getDataDeNascimento().toString(),
                         autor.getCpf(),
-                        List.of()
+                        autor.getLivros()
+                                .stream()
+                                .map(Livro::getId)
+                                .toList()
                 ))
                 .toList();
     }
@@ -47,7 +51,10 @@ public class AutorService {
                 autor.getSexo(),
                 autor.getDataDeNascimento().toString(),
                 autor.getCpf(),
-                List.of()
+                autor.getLivros()
+                        .stream()
+                        .map(Livro::getId)
+                        .toList()
         );
     }
 
@@ -84,7 +91,10 @@ public class AutorService {
                 autorSalvo.getSexo(),
                 autorSalvo.getDataDeNascimento().toString(),
                 autorSalvo.getCpf(),
-                List.of()
+                autor.getLivros()
+                        .stream()
+                        .map(Livro::getId)
+                        .toList()
         );
     }
 
@@ -133,14 +143,24 @@ public class AutorService {
                 autorAtualizado.getSexo(),
                 autorAtualizado.getDataDeNascimento().toString(),
                 autorAtualizado.getCpf(),
-                List.of()
+                autor.getLivros()
+                        .stream()
+                        .map(Livro::getId)
+                        .toList()
         );
     }
 
     public void deletarAutor(Long id) {
+
         Autor autor = autorRepository.findById(id)
                 .orElseThrow(() ->
                         new RuntimeException("Autor com Id " + id + " não encontrado!"));
+
+        if (!autor.getLivros().isEmpty()) {
+            throw new RuntimeException(
+                    "Não é possível excluir um autor que tenha livros associados!"
+            );
+        }
 
         autorRepository.delete(autor);
     }

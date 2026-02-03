@@ -32,4 +32,15 @@ public class LivroController {
         return ResponseEntity.ok(livroService.salvarLivro(livroRequest));
     }
 
+    @PutMapping("/{livroId}/autor/{autorId}")
+    public ResponseEntity<LivroResponse> adicionarAutorAoLivro(
+            @PathVariable Long livroId,
+            @PathVariable Long autorId
+    ) {
+        LivroResponse response =
+                livroService.adicionarAutorAoLivro(livroId, autorId);
+
+        return ResponseEntity.ok(response);
+    }
+
 }

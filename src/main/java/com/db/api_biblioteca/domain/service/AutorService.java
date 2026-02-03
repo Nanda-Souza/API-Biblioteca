@@ -155,6 +155,12 @@ public class AutorService {
                 .orElseThrow(() ->
                         new RuntimeException("Autor com Id " + id + " não encontrado!"));
 
+        if (!autor.getLivros().isEmpty()) {
+            throw new RuntimeException(
+                    "Não é possível excluir um autor que tenha livros associados!"
+            );
+        }
+
         autorRepository.delete(autor);
     }
 }

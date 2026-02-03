@@ -4,6 +4,7 @@ import com.db.api_biblioteca.domain.dto.AutorRequest;
 import com.db.api_biblioteca.domain.dto.AutorResponse;
 import com.db.api_biblioteca.domain.dto.AutorUpdateRequest;
 import com.db.api_biblioteca.domain.entity.Autor;
+import com.db.api_biblioteca.domain.entity.Livro;
 import com.db.api_biblioteca.domain.repository.AutorRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -235,6 +236,39 @@ public class AutorServiceTest {
         assertEquals("Autor com Id 1 não encontrado!",exception.getMessage(), "Deve retornar autor com id 1 não encontrado!");
 
         verify(autorRepository).findById(id);
+        verify(autorRepository, never()).delete(any());
+    }
+
+    @Test
+    @DisplayName("Não deve excluir autor que possua livros associados!")
+    void naoDeveExcluirAutorComLivros() {
+
+        Long autorId = 1L;
+
+        Autor autor = new Autor(
+                "Jorge Amado",
+                LocalDate.parse("1912-08-10"),
+                "12345678900"
+        );
+
+        Livro livro = new Livro(
+                "Capitães da Areia",
+                "9788535914849",
+                LocalDate.parse("1937-01-01")
+        );
+
+        autor.getLivros().add(livro);
+
+        when(autorRepository.findById(autorId))
+                .thenReturn(Optional.of(autor));
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> autorService.deletarAutor(autorId)
+        );
+
+        assertEquals("Não é possível excluir um autor que tenha livros associados!", exception.getMessage(), "Deve retornar que não é possivel excluir pois autor tem um livro associado!");
+
         verify(autorRepository, never()).delete(any());
     }
 

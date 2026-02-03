@@ -2,6 +2,7 @@ package com.db.api_biblioteca.controller;
 
 import com.db.api_biblioteca.domain.dto.LivroRequest;
 import com.db.api_biblioteca.domain.dto.LivroResponse;
+import com.db.api_biblioteca.domain.dto.LivroPorAutorResponse;
 import com.db.api_biblioteca.domain.service.LivroService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,13 @@ public class LivroController {
             @PathVariable Long livroId
     ) {
         return ResponseEntity.ok(livroService.buscarLivroPorId(livroId));
+    }
+
+    @GetMapping("/autor/{autorId}/listar")
+    public ResponseEntity<List<LivroPorAutorResponse>> listarLivrosPorIdAutor(
+            @PathVariable Long autorId
+    ) {
+        return ResponseEntity.ok(livroService.listarLivrosPorIdAutor(autorId));
     }
 
     @PostMapping

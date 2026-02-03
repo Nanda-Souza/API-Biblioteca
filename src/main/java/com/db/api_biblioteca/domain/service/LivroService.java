@@ -2,6 +2,7 @@ package com.db.api_biblioteca.domain.service;
 
 import com.db.api_biblioteca.domain.dto.LivroRequest;
 import com.db.api_biblioteca.domain.dto.LivroResponse;
+import com.db.api_biblioteca.domain.dto.LivroPorAutorResponse;
 import com.db.api_biblioteca.domain.entity.Autor;
 import com.db.api_biblioteca.domain.entity.Livro;
 import com.db.api_biblioteca.domain.repository.AutorRepository;
@@ -150,10 +151,10 @@ public class LivroService {
         );
     }
 
-    public LivroResponse buscarLivroPorId(Long id) {
-        Livro livro = livroRepository.findById(id)
+    public LivroResponse buscarLivroPorId(Long livroId) {
+        Livro livro = livroRepository.findById(livroId)
                 .orElseThrow(() ->
-                        new RuntimeException("Livro com Id " + id + " não encontrado!")
+                        new RuntimeException("Livro com Id " + livroId + " não encontrado!")
                 );
 
         return new LivroResponse(
@@ -166,6 +167,24 @@ public class LivroService {
                         .map(Autor::getId)
                         .toList()
         );
+    }
+
+    public List<LivroPorAutorResponse> listarLivrosPorIdAutor(Long autorId) {
+
+        Autor autor = autorRepository.findById(autorId)
+                .orElseThrow(() ->
+                        new RuntimeException("Autor com id " + autorId + " não encontrado!")
+                );
+
+        return autor.getLivros()
+                .stream()
+                .map(livro -> new LivroPorAutorResponse(
+                        livro.getId(),
+                        livro.getNome(),
+                        livro.getIsbd(),
+                        livro.getDataDePublicacao().toString()
+                ))
+                .toList();
     }
 
 }

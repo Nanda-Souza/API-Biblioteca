@@ -1,9 +1,6 @@
 package com.db.api_biblioteca.domain.service;
 
-import com.db.api_biblioteca.domain.dto.AutorRequest;
-import com.db.api_biblioteca.domain.dto.AutorResponse;
-import com.db.api_biblioteca.domain.dto.LivroRequest;
-import com.db.api_biblioteca.domain.dto.LivroResponse;
+import com.db.api_biblioteca.domain.dto.*;
 import com.db.api_biblioteca.domain.entity.Autor;
 import com.db.api_biblioteca.domain.entity.Livro;
 import com.db.api_biblioteca.domain.repository.AutorRepository;
@@ -505,6 +502,70 @@ public class LivroServiceTest {
         assertEquals("Livro com Id 1 não encontrado!", exception.getMessage(), "Deve retornar que o livro com id não foi encontrado!");
 
         verify(livroRepository).findById(1L);
+    }
+
+    @Test
+    @DisplayName("Deve listar os livros de um autor com sucesso!")
+    void deveListarLivrosPorIdDoAutor() {
+
+        Long autorId = 1L;
+
+        Autor autor = new Autor(
+                "Jorge Amado",
+                LocalDate.parse("1912-08-10"),
+                "12345678900"
+        );
+
+        Livro livro1 = new Livro(
+                "Capitães da Areia",
+                "9788535914849",
+                LocalDate.parse("1937-01-01")
+        );
+
+        Livro livro2 = new Livro(
+                "Dona Flor e Seus Dois Maridos",
+                "9788535902778",
+                LocalDate.parse("1966-01-01")
+        );
+
+        // Simula relacionamento
+        autor.getLivros().add(livro1);
+        autor.getLivros().add(livro2);
+
+        when(autorRepository.findById(autorId))
+                .thenReturn(Optional.of(autor));
+
+        List<LivroPorAutorResponse> response = livroService.listarLivrosPorIdAutor(autorId);
+
+
+        assertNotNull(response, "O retorno não pode ser nulo!");
+        assertEquals(2, response.size(), "Deve retornar uma lista com dois livros!");
+
+        assertEquals("Capitães da Areia", response.get(0).nome(), "Deve retornar Capitães da Areia!");
+        assertEquals("Dona Flor e Seus Dois Maridos", response.get(1).nome(), "Dona Flor e Seus Dois Maridos!");
+
+        verify(autorRepository).findById(autorId);
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção quando autor não for encontrado!")
+    void deveLancarErroQuandoNaoEncontrarAutor() {
+
+        // Arrange
+        Long autorId = 1L;
+
+        when(autorRepository.findById(autorId))
+                .thenReturn(Optional.empty());
+
+        // Act + Assert
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> livroService.listarLivrosPorIdAutor(autorId)
+        );
+
+        assertEquals("Autor com id 1 não encontrado!", exception.getMessage(), "Deve retornar autor com id 1 não encontrado!");
+
+        verify(autorRepository).findById(autorId);
     }
 
 

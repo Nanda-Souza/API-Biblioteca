@@ -1,14 +1,30 @@
 package com.db.api_biblioteca.domain.entity;
 
-import java.time.LocalDate;
+import jakarta.persistence.*;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "locatario")
 public class Locatario {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String nome;
     private String Sexo;
     private String telefone;
     private String email;
     private LocalDate dataDeNascimento;
+
+    @Column(name = "CPF", unique = true, nullable = false)
     private String cpf;
+
+    @OneToMany(mappedBy = "locatario")
+    private List<Aluguel> alugueis = new ArrayList<>();
 
     public Locatario(String nome, String telefone, String email, LocalDate dataDeNascimento, String cpf) {
         this.nome = nome;
@@ -16,6 +32,12 @@ public class Locatario {
         this.email = email;
         this.dataDeNascimento = dataDeNascimento;
         this.cpf = cpf;
+    }
+
+    protected Locatario() {}
+
+    public Long getId() {
+        return id;
     }
 
     public String getNome() {
@@ -64,5 +86,9 @@ public class Locatario {
 
     public void setCpf(String cpf) {
         this.cpf = cpf;
+    }
+
+    public List<Aluguel> getAlugueis() {
+        return alugueis;
     }
 }

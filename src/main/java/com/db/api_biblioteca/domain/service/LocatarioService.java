@@ -1,8 +1,9 @@
 package com.db.api_biblioteca.domain.service;
 
-import com.db.api_biblioteca.domain.dto.LocatarioRequest;
-import com.db.api_biblioteca.domain.dto.LocatarioResponse;
+import com.db.api_biblioteca.domain.dto.*;
 import com.db.api_biblioteca.domain.entity.Aluguel;
+import com.db.api_biblioteca.domain.entity.Autor;
+import com.db.api_biblioteca.domain.entity.Livro;
 import com.db.api_biblioteca.domain.entity.Locatario;
 import com.db.api_biblioteca.domain.repository.LocatarioRepository;
 import com.db.api_biblioteca.domain.validation.DataValidator;
@@ -85,6 +86,75 @@ public class LocatarioService {
                         .toList()
         );
 
+    }
+
+    public LocatarioResponse atualizarLocatario(Long id, LocatarioUpdateRequest locatarioUpdate) {
+
+
+        Locatario locatario = locatarioRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Locatario com Id " + id + " não encontrado!"));
+
+        if (locatarioUpdate.nome() != null) {
+            if(locatarioUpdate.nome().isBlank()){
+                throw new IllegalArgumentException("Nome não pode ser vazio!");
+            }
+            locatario.setNome(locatarioUpdate.nome());
+
+        }
+
+        if (locatarioUpdate.sexo() != null){
+            if(!DataValidator.sexoValido(locatarioUpdate.sexo())){
+                throw new IllegalArgumentException("Sexo inválido. Valores permitidos: Masculino, Feminino ou Outro!");
+            }
+            locatario.setSexo(locatarioUpdate.sexo());
+        }
+
+        if (locatarioUpdate.telefone() != null) {
+            if(locatarioUpdate.telefone().isBlank()){
+                throw new IllegalArgumentException("Telefone não pode ser vazio!");
+            }
+            locatario.setTelefone(locatarioUpdate.telefone());
+
+        }
+
+        if (locatarioUpdate.email() != null) {
+            if (locatarioRepository.existsByEmail(locatarioUpdate.email())) {
+                throw new IllegalArgumentException("Email já cadastrado!");
+            }
+            locatario.setEmail(locatarioUpdate.email());
+        }
+
+        if (locatarioUpdate.dataDeNascimento() != null) {
+            if (!DataValidator.dataNascimentoValida(locatarioUpdate.dataDeNascimento())){
+                throw new IllegalArgumentException("Data de nascimento no formato inválido ou no futuro!");
+
+            }
+            locatario.setDataDeNascimento(LocalDate.parse(locatarioUpdate.dataDeNascimento()));
+        }
+
+        if (locatarioUpdate.cpf() != null) {
+            if (locatarioRepository.existsByCpf(locatarioUpdate.cpf())) {
+                throw new IllegalArgumentException("CPF já cadastrado!");
+            }
+            locatario.setCpf(locatarioUpdate.cpf());
+        }
+
+        Locatario locatarioAtualizado = locatarioRepository.save(locatario);
+
+        return new LocatarioResponse(
+                locatario.getId(),
+                locatarioAtualizado.getNome(),
+                locatarioAtualizado.getSexo(),
+                locatarioAtualizado.getTelefone(),
+                locatarioAtualizado.getEmail(),
+                locatarioAtualizado.getDataDeNascimento().toString(),
+                locatarioAtualizado.getCpf(),
+                locatario.getAlugueis()
+                        .stream()
+                        .map(Aluguel::getId)
+                        .toList()
+        );
     }
 
 

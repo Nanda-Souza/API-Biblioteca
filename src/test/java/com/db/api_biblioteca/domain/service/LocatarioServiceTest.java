@@ -1,10 +1,7 @@
 package com.db.api_biblioteca.domain.service;
 
-import com.db.api_biblioteca.domain.dto.AutorRequest;
-import com.db.api_biblioteca.domain.dto.AutorResponse;
 import com.db.api_biblioteca.domain.dto.LocatarioRequest;
 import com.db.api_biblioteca.domain.dto.LocatarioResponse;
-import com.db.api_biblioteca.domain.entity.Autor;
 import com.db.api_biblioteca.domain.entity.Locatario;
 import com.db.api_biblioteca.domain.repository.LocatarioRepository;
 import org.junit.jupiter.api.DisplayName;

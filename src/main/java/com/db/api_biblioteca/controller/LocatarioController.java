@@ -1,7 +1,6 @@
 package com.db.api_biblioteca.controller;
 
-import com.db.api_biblioteca.domain.dto.LocatarioRequest;
-import com.db.api_biblioteca.domain.dto.LocatarioResponse;
+import com.db.api_biblioteca.domain.dto.*;
 import com.db.api_biblioteca.domain.entity.Locatario;
 import com.db.api_biblioteca.domain.service.LocatarioService;
 import jakarta.validation.Valid;
@@ -32,4 +31,13 @@ public class LocatarioController {
     ) {
        return ResponseEntity.ok(locatarioService.salvarLocatario(locatarioRequest));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<LocatarioResponse> atualizarLocatario(
+            @PathVariable Long id,
+            @RequestBody LocatarioUpdateRequest locatarioRequest
+    ) {
+        return ResponseEntity.ok(locatarioService.atualizarLocatario(id, locatarioRequest));
+    }
+
 }

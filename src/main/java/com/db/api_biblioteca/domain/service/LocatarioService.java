@@ -61,13 +61,13 @@ public class LocatarioService {
 
         Locatario locatario = new Locatario(
                 locatarioRequest.nome(),
+                locatarioRequest.telefone(),
                 locatarioRequest.email(),
                 LocalDate.parse(locatarioRequest.dataDeNascimento()),
                 locatarioRequest.cpf()
         );
 
         locatario.setSexo(locatarioRequest.sexo());
-        locatario.setTelefone(locatarioRequest.telefone());
 
         Locatario locatarioSalvo = locatarioRepository.save(locatario);
 

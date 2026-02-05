@@ -29,8 +29,9 @@ public class Locatario {
     @OneToMany(mappedBy = "locatario")
     private List<Aluguel> alugueis = new ArrayList<>();
 
-    public Locatario(String nome, String email, LocalDate dataDeNascimento, String cpf) {
+    public Locatario(String nome, String telefone, String email, LocalDate dataDeNascimento, String cpf) {
         this.nome = nome;
+        this.telefone = telefone;
         this.email = email;
         this.dataDeNascimento = dataDeNascimento;
         this.cpf = cpf;

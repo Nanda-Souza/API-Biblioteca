@@ -4,7 +4,6 @@ import com.db.api_biblioteca.domain.dto.AluguelRequest;
 import com.db.api_biblioteca.domain.dto.AluguelResponse;
 import com.db.api_biblioteca.domain.dto.LivroResponse;
 import com.db.api_biblioteca.domain.entity.Aluguel;
-import com.db.api_biblioteca.domain.entity.Autor;
 import com.db.api_biblioteca.domain.entity.Livro;
 import com.db.api_biblioteca.domain.entity.Locatario;
 import com.db.api_biblioteca.domain.repository.AluguelRepository;
@@ -18,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -39,6 +39,16 @@ public class AluguelServiceTest {
 
     @InjectMocks
     private AluguelService aluguelService;
+
+    private void setId(Object entity, Long id) {
+        try {
+            Field field = entity.getClass().getDeclaredField("id");
+            field.setAccessible(true);
+            field.set(entity, id);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Test
     @DisplayName("Deve listar todos os alugueis cadastrados!")
@@ -208,7 +218,38 @@ public class AluguelServiceTest {
         verify(aluguelRepository, never()).save(any());
     }
 
+    @Test
+    @DisplayName("Deve listar apenas livros disponíveis para aluguel")
+    void deveListarLivrosDisponiveisParaAluguel() {
 
+        Livro livroDisponivel = new Livro(
+                "Capitães da Areia",
+                "9788535914849",
+                LocalDate.parse("1937-01-01")
+        );
+
+        Livro livroAlugado = new Livro(
+                "Gabriela, Cravo e Canela",
+                "9788535914856",
+                LocalDate.parse("1958-01-01")
+        );
+
+        // 👇 simula IDs gerados pelo banco
+        setId(livroDisponivel, 1L);
+        setId(livroAlugado, 2L);
+
+        when(livroRepository.findAll())
+                .thenReturn(List.of(livroDisponivel, livroAlugado));
+
+        when(aluguelRepository.buscarIdsLivrosAlugados())
+                .thenReturn(List.of(2L));
+
+        List<LivroResponse> response =
+                aluguelService.listarLivrosDisponiveis();
+
+        assertEquals(1, response.size(), "Deve retornar uma lista com um livro disponivel!");
+        assertEquals("Capitães da Areia", response.get(0).nome(), "Deve retornar Capitães da Areia!");
+    }
 
 
 

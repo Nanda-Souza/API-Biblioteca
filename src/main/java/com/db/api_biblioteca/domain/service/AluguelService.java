@@ -75,6 +75,27 @@ public class AluguelService {
 
     }
 
+    public List<LivroResponse> listarLivrosDisponiveis() {
+
+        List<Long> livrosAlugadosIds = aluguelRepository.buscarIdsLivrosAlugados();
+
+        return livroRepository.findAll()
+                .stream()
+                .filter(livro -> !livrosAlugadosIds.contains(livro.getId()))
+                .map(livro -> new LivroResponse(
+                        livro.getId(),
+                        livro.getNome(),
+                        livro.getIsbn(),
+                        livro.getDataDePublicacao().toString(),
+                        livro.getAutores()
+                                .stream()
+                                .map(Autor::getId)
+                                .toList()
+                ))
+                .toList();
+    }
+
+
 
 
 

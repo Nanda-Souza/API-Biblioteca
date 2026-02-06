@@ -93,7 +93,7 @@ public class LocatarioService {
 
         Locatario locatario = locatarioRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Locatario com Id " + id + " não encontrado!"));
+                        new RuntimeException("Locatário com Id " + id + " não encontrado!"));
 
         if (locatarioUpdate.nome() != null) {
             if(locatarioUpdate.nome().isBlank()){

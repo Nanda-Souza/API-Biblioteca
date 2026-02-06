@@ -2,6 +2,7 @@ package com.db.api_biblioteca.domain.service;
 
 import com.db.api_biblioteca.domain.dto.LocatarioRequest;
 import com.db.api_biblioteca.domain.dto.LocatarioResponse;
+import com.db.api_biblioteca.domain.dto.LocatarioUpdateRequest;
 import com.db.api_biblioteca.domain.entity.Locatario;
 import com.db.api_biblioteca.domain.repository.LocatarioRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -193,6 +195,157 @@ public class LocatarioServiceTest {
         assertEquals("Fernanda Alvez", segundoLocatario.nome(), "Deve retornar Fernanda Alvez!");
 
         verify(locatarioRepository, times(1)).findAll();
+    }
+
+    @Test
+    @DisplayName("Deve atualizar locatário com sucesso!")
+    void deveAtualizarLocatarioComSucesso() {
+
+        Long id = 1L;
+
+        Locatario locatario = new Locatario(
+                "Ana",
+                "993569926",
+                "ana@gmail.com",
+                LocalDate.parse("1990-05-05"),
+                "12345678900"
+
+        );
+
+        LocatarioUpdateRequest updateRequest = new LocatarioUpdateRequest(
+                "Ana Paula",
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        when(locatarioRepository.findById(id))
+                .thenReturn(Optional.of(locatario));
+
+        when(locatarioRepository.save(any(Locatario.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        LocatarioResponse response = locatarioService.atualizarLocatario(id, updateRequest);
+
+        assertNotNull(response, "O retorno não pode ser nulo!");
+        assertEquals("Ana Paula", response.nome(), "Deve retornar Ana Paula!");
+
+        verify(locatarioRepository).findById(id);
+        verify(locatarioRepository).save(any(Locatario.class));
+
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao tentar atualizar locatário inexistente")
+    void deveLancarExcecaoQuandoAtualizarLocatarioNaoEncontrado() {
+
+        Long id = 1L;
+
+        LocatarioUpdateRequest updateRequest = new LocatarioUpdateRequest(
+                "Ana Paula",
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        when(locatarioRepository.findById(id))
+                .thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> locatarioService.atualizarLocatario(id, updateRequest)
+        );
+
+        assertEquals("Locatário com Id 1 não encontrado!",exception.getMessage(), "Deve retornar locatário com id 1 não encontrado!");
+
+        verify(locatarioRepository).findById(id);
+        verify(locatarioRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Não deve atualizar locatário quando CPF já estiver cadastrado!")
+    void naoDeveAtualizarLocatarioComCpfDuplicado() {
+
+        Long id = 1L;
+
+        Locatario locatarioExistente = new Locatario(
+                "Ana",
+                "993569926",
+                "ana@gmail.com",
+                LocalDate.parse("1990-05-05"),
+                "12345678900"
+
+        );
+
+        LocatarioUpdateRequest updateRequest = new LocatarioUpdateRequest(
+                null,
+                null,
+                null,
+                null,
+                null,
+                "12345678900"
+        );
+
+        when(locatarioRepository.findById(id))
+                .thenReturn(Optional.of(locatarioExistente));
+
+        when(locatarioRepository.existsByCpf("12345678900"))
+                .thenReturn(true);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> locatarioService.atualizarLocatario(id, updateRequest)
+        );
+
+        assertEquals("CPF já cadastrado!", exception.getMessage(), "Deve retornar a mensagem de cpf já cadastrado!");
+
+        verify(locatarioRepository).findById(id);
+        verify(locatarioRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Não deve atualizar locatário quando Email já estiver cadastrado!")
+    void naoDeveAtualizarLocatarioComEmailDuplicado() {
+
+        Long id = 1L;
+
+        Locatario locatarioExistente = new Locatario(
+                "Ana",
+                "993569926",
+                "ana@gmail.com",
+                LocalDate.parse("1990-05-05"),
+                "12345678900"
+
+        );
+
+        LocatarioUpdateRequest updateRequest = new LocatarioUpdateRequest(
+                null,
+                null,
+                null,
+                "ana@gmail.com",
+                null,
+                null
+        );
+
+        when(locatarioRepository.findById(id))
+                .thenReturn(Optional.of(locatarioExistente));
+
+        when(locatarioRepository.existsByEmail("ana@gmail.com"))
+                .thenReturn(true);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> locatarioService.atualizarLocatario(id, updateRequest)
+        );
+
+        assertEquals("Email já cadastrado!", exception.getMessage(), "Deve retornar a mensagem de email já cadastrado!");
+
+        verify(locatarioRepository).findById(id);
+        verify(locatarioRepository, never()).save(any());
     }
 
 

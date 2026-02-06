@@ -114,6 +114,31 @@ public class AluguelService {
                 .toList();
     }
 
+    public List<LivroResponse> listarLivrosAlugadosPorLocatario(Long locatarioId) {
+
+        Locatario locatario = locatarioRepository.findById(locatarioId)
+                .orElseThrow(() ->
+                        new RuntimeException("Locatário com id " + locatarioId + " não encontrado!")
+                );
+
+        return locatario.getAlugueis()
+                .stream()
+                .flatMap(aluguel -> aluguel.getLivros().stream())
+                .distinct()
+                .map(livro -> new LivroResponse(
+                        livro.getId(),
+                        livro.getNome(),
+                        livro.getIsbn(),
+                        livro.getDataDePublicacao().toString(),
+                        livro.getAutores()
+                                .stream()
+                                .map(Autor::getId)
+                                .toList()
+                ))
+                .toList();
+    }
+
+
 
 
 

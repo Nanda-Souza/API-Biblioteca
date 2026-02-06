@@ -291,6 +291,50 @@ public class AluguelServiceTest {
         verify(aluguelRepository, times(1)).findAll();
     }
 
+    @Test
+    @DisplayName("Deve listar todos os livros alugados por um locatário")
+    void deveListarLivrosAlugadosPorLocatario() {
+
+        Locatario locatario = new Locatario(
+                "Ana Paula",
+                "999999999",
+                "ana@email.com",
+                LocalDate.parse("1990-05-12"),
+                "12345678901"
+        );
+
+        Livro livro1 = new Livro(
+                "Capitães da Areia",
+                "9788535914849",
+                LocalDate.parse("1937-01-01")
+        );
+
+        Livro livro2 = new Livro(
+                "Gabriela, Cravo e Canela",
+                "9788535914856",
+                LocalDate.parse("1958-01-01")
+        );
+
+        Aluguel aluguel1 = new Aluguel(locatario, List.of(livro1));
+        Aluguel aluguel2 = new Aluguel(locatario, List.of(livro2));
+
+        locatario.getAlugueis().add(aluguel1);
+        locatario.getAlugueis().add(aluguel2);
+
+        when(locatarioRepository.findById(1L))
+                .thenReturn(Optional.of(locatario));
+
+        List<LivroResponse> response =
+                aluguelService.listarLivrosAlugadosPorLocatario(1L);
+
+        assertNotNull(response, "O retorno não pode ser nulo!");
+        assertEquals(2, response.size(), "Deve retornar uma lista com dois livros alugados!");
+        assertEquals("Capitães da Areia", response.get(0).nome(), "Deve retornar Capitães da Areia!");
+        assertEquals("Gabriela, Cravo e Canela", response.get(1).nome(), "Gabriela, Cravo e Canela!");
+
+        verify(locatarioRepository, times(1)).findById(1L);
+    }
+
 
 
 

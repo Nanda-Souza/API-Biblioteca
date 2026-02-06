@@ -43,5 +43,10 @@ public class AluguelController {
         return ResponseEntity.ok(aluguelService.listarLivrosAlugados());
     }
 
+    @GetMapping("/locatario/{id}")
+    public ResponseEntity<List<LivroResponse>> listarLivrosAlugadosPorLocatario(@PathVariable Long id) {
+        return ResponseEntity.ok(aluguelService.listarLivrosAlugadosPorLocatario(id));
+    }
+
 
 }

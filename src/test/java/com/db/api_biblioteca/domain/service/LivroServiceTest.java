@@ -3,6 +3,7 @@ package com.db.api_biblioteca.domain.service;
 import com.db.api_biblioteca.domain.dto.*;
 import com.db.api_biblioteca.domain.entity.Autor;
 import com.db.api_biblioteca.domain.entity.Livro;
+import com.db.api_biblioteca.domain.repository.AluguelRepository;
 import com.db.api_biblioteca.domain.repository.AutorRepository;
 import com.db.api_biblioteca.domain.repository.LivroRepository;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +29,9 @@ public class LivroServiceTest {
 
     @Mock
     private AutorRepository autorRepository;
+
+    @Mock
+    private AluguelRepository aluguelRepository;
 
     @InjectMocks
     private LivroService livroService;
@@ -91,9 +95,35 @@ public class LivroServiceTest {
                 () -> livroService.salvarLivro(request)
         );
 
-        assertEquals("Um ou mais autores não encontrados!", exception.getMessage(),"Deve retornar erro quando nem todos os autores existirem!");
+        assertEquals("Um ou mais autores não foram encontrados!", exception.getMessage(),"Deve retornar erro quando nem todos os autores existirem!");
 
         verify(livroRepository, never()).save(any(Livro.class));
+    }
+
+    @Test
+    @DisplayName("Não deve deletar livro quando ele estiver alugado!")
+    void naoDeveDeletarLivroQuandoEstiverAlugado() {
+
+        Livro livro = new Livro(
+                "Capitães da Areia",
+                "9788535914849",
+                LocalDate.parse("1937-01-01")
+        );
+
+        when(livroRepository.findById(1L))
+                .thenReturn(Optional.of(livro));
+
+        when(aluguelRepository.existsByLivros_Id(1L))
+                .thenReturn(true);
+
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> livroService.deletarLivro(1L)
+        );
+
+        assertEquals("Livro não pode ser excluído pois já está alugado!",exception.getMessage(),"Deve retornar erro quando o livro já tiver sido alugado!");
+
+        verify(livroRepository, never()).delete(any(Livro.class));
     }
 
     @Test

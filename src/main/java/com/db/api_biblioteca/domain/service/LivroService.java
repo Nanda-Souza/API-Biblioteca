@@ -6,6 +6,7 @@ import com.db.api_biblioteca.domain.dto.LivroPorAutorResponse;
 import com.db.api_biblioteca.domain.dto.LivroUpdateRequest;
 import com.db.api_biblioteca.domain.entity.Autor;
 import com.db.api_biblioteca.domain.entity.Livro;
+import com.db.api_biblioteca.domain.repository.AluguelRepository;
 import com.db.api_biblioteca.domain.repository.AutorRepository;
 import com.db.api_biblioteca.domain.repository.LivroRepository;
 import com.db.api_biblioteca.domain.validation.DataValidator;
@@ -19,10 +20,12 @@ public class LivroService {
 
     private final LivroRepository livroRepository;
     private final AutorRepository autorRepository;
+    private final AluguelRepository aluguelRepository;
 
-    public LivroService(LivroRepository livroRepository, AutorRepository autorRepository) {
+    public LivroService(LivroRepository livroRepository, AutorRepository autorRepository, AluguelRepository aluguelRepository) {
         this.livroRepository = livroRepository;
         this.autorRepository = autorRepository;
+        this.aluguelRepository = aluguelRepository;
 
     }
 
@@ -57,7 +60,7 @@ public class LivroService {
         List<Autor> autores = autorRepository.findAllById(livroRequest.autoresIds());
 
         if (autores.size() != livroRequest.autoresIds().size()) {
-            throw new IllegalArgumentException("Um ou mais autores não encontrados!");
+            throw new IllegalArgumentException("Um ou mais autores não foram encontrados!");
         }
 
         Livro livro = new Livro(
@@ -194,6 +197,12 @@ public class LivroService {
                 .orElseThrow(() ->
                         new RuntimeException("Livro com id " + livroId + " não encontrado!")
                 );
+
+        if (aluguelRepository.existsByLivros_Id(livroId)) {
+            throw new IllegalStateException(
+                    "Livro não pode ser excluído pois já está alugado!"
+            );
+        }
 
         for (Autor autor : livro.getAutores()) {
             autor.getLivros().remove(livro);

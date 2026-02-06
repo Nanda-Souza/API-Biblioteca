@@ -4,6 +4,7 @@ import com.db.api_biblioteca.domain.dto.LocatarioRequest;
 import com.db.api_biblioteca.domain.dto.LocatarioResponse;
 import com.db.api_biblioteca.domain.dto.LocatarioUpdateRequest;
 import com.db.api_biblioteca.domain.entity.Locatario;
+import com.db.api_biblioteca.domain.repository.AluguelRepository;
 import com.db.api_biblioteca.domain.repository.LocatarioRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,9 @@ public class LocatarioServiceTest {
 
     @Mock
     private LocatarioRepository locatarioRepository;
+
+    @Mock
+    private AluguelRepository aluguelRepository;
 
     @InjectMocks
     private LocatarioService locatarioService;
@@ -391,6 +395,34 @@ public class LocatarioServiceTest {
 
         verify(locatarioRepository).findById(id);
         verify(locatarioRepository, never()).delete(any());
+    }
+
+    @Test
+    @DisplayName("Não deve deletar locatário quando ele possuir livro para devolução!")
+    void naoDeveDeletarLocatarioQuandoPossuirLivroParaDevolucao() {
+
+        Locatario locatario = new Locatario(
+                "Ana Paula Souza Oliveira",
+                "987654321",
+                "ana.souza@email.com",
+                LocalDate.parse("1990-05-12"),
+                "12345678901"
+        );
+
+        when(locatarioRepository.findById(1L))
+                .thenReturn(Optional.of(locatario));
+
+        when(aluguelRepository.existsByLocatario_Id(1L))
+                .thenReturn(true);
+
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> locatarioService.deletarLocatario(1L)
+        );
+
+        assertEquals("Locatário não pode ser excluído pois possui livro(s) para devolver!",exception.getMessage(),"Deve impedir exclusão do locatário com aluguel ativo!");
+
+        verify(locatarioRepository, never()).delete(any(Locatario.class));
     }
 
 

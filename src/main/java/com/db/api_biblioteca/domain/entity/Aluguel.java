@@ -30,10 +30,9 @@ public class Aluguel {
     )
     private List<Livro> livros = new ArrayList<>();
 
-    public Aluguel(LocalDate dataRetirada, LocalDate dataDevolucao,
-                   Locatario locatario, List<Livro> livros) {
-        this.dataRetirada = dataRetirada;
-        this.dataDevolucao = dataDevolucao;
+    public Aluguel(Locatario locatario, List<Livro> livros) {
+        this.dataRetirada = LocalDate.now();
+        this.dataDevolucao = dataRetirada.plusDays(2);
         this.locatario = locatario;
         this.livros = livros;
     }
@@ -62,8 +61,12 @@ public class Aluguel {
         return livros;
     }
 
-    public void setLivros(ArrayList<Livro> livros) {
+    public void setLivros(List<Livro> livros) {
         this.livros = livros;
     }
+
+    public Locatario getLocatario() { return locatario; }
+
+    public void setLocatario(Locatario locatario) {}
 
 }

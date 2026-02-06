@@ -37,4 +37,11 @@ public class AluguelController {
         return ResponseEntity.ok(aluguelService.listarLivrosDisponiveis());
     }
 
+    @GetMapping("/alugados")
+    public ResponseEntity<List<LivroResponse>> listarLivrosAlugados() {
+
+        return ResponseEntity.ok(aluguelService.listarLivrosAlugados());
+    }
+
+
 }

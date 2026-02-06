@@ -95,6 +95,25 @@ public class AluguelService {
                 .toList();
     }
 
+    public List<LivroResponse> listarLivrosAlugados() {
+
+        return aluguelRepository.findAll()
+                .stream()
+                .flatMap(aluguel -> aluguel.getLivros().stream())
+                .distinct()
+                .map(livro -> new LivroResponse(
+                        livro.getId(),
+                        livro.getNome(),
+                        livro.getIsbn(),
+                        livro.getDataDePublicacao().toString(),
+                        livro.getAutores()
+                                .stream()
+                                .map(Autor::getId)
+                                .toList()
+                ))
+                .toList();
+    }
+
 
 
 

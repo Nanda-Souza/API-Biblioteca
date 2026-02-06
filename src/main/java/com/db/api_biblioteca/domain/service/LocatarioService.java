@@ -5,6 +5,7 @@ import com.db.api_biblioteca.domain.entity.Aluguel;
 import com.db.api_biblioteca.domain.entity.Autor;
 import com.db.api_biblioteca.domain.entity.Livro;
 import com.db.api_biblioteca.domain.entity.Locatario;
+import com.db.api_biblioteca.domain.repository.AluguelRepository;
 import com.db.api_biblioteca.domain.repository.LocatarioRepository;
 import com.db.api_biblioteca.domain.validation.DataValidator;
 import org.springframework.stereotype.Service;
@@ -16,8 +17,12 @@ import java.util.List;
 public class LocatarioService {
 
     private final LocatarioRepository locatarioRepository;
+    private final AluguelRepository aluguelRepository;
 
-    public LocatarioService(LocatarioRepository locatarioRepository) { this.locatarioRepository = locatarioRepository; }
+    public LocatarioService(LocatarioRepository locatarioRepository, AluguelRepository aluguelRepository) {
+        this.locatarioRepository = locatarioRepository;
+        this.aluguelRepository = aluguelRepository;
+    }
 
     public List<LocatarioResponse> listarLocatarios() {
 
@@ -162,6 +167,12 @@ public class LocatarioService {
         Locatario locatario = locatarioRepository.findById(id)
                 .orElseThrow(() ->
                         new RuntimeException("Locatário com Id " + id + " não encontrado!"));
+
+        if (aluguelRepository.existsByLocatario_Id(id)) {
+            throw new IllegalStateException(
+                    "Locatário não pode ser excluído pois possui livro(s) para devolver!"
+            );
+        }
 
         locatarioRepository.delete(locatario);
     }

@@ -138,6 +138,17 @@ public class AluguelService {
                 .toList();
     }
 
+    public void deletarAluguel(Long aluguelId) {
+
+        Aluguel aluguel = aluguelRepository.findById(aluguelId)
+                .orElseThrow(() ->
+                        new RuntimeException("Aluguel com id " + aluguelId + " não encontrado!")
+                );
+
+        aluguelRepository.delete(aluguel);
+    }
+
+
 
 
 

@@ -48,5 +48,11 @@ public class AluguelController {
         return ResponseEntity.ok(aluguelService.listarLivrosAlugadosPorLocatario(id));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluirAluguel(@PathVariable Long id) {
+        aluguelService.deletarAluguel(id);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }

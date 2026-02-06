@@ -1,20 +1,46 @@
 package com.db.api_biblioteca.domain.entity;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
+@Entity
+@Table(name = "aluguel")
 public class Aluguel {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private LocalDate dataRetirada;
     private LocalDate dataDevolucao;
-    private ArrayList<Livro> livros;
-    private ArrayList<Locatario> locatarios;
 
-    public Aluguel(LocalDate dataRetirada, LocalDate dataDevolucao, ArrayList<Livro> livros, ArrayList<Locatario> locatarios) {
+    @ManyToOne
+    @JoinColumn(name = "locatario_id", nullable = false)
+    private Locatario locatario;
+
+
+    @ManyToMany
+    @JoinTable(
+            name = "aluguel_livro",
+            joinColumns = @JoinColumn(name = "aluguel_id"),
+            inverseJoinColumns = @JoinColumn(name = "livro_id")
+    )
+    private List<Livro> livros = new ArrayList<>();
+
+    public Aluguel(LocalDate dataRetirada, LocalDate dataDevolucao,
+                   Locatario locatario, List<Livro> livros) {
         this.dataRetirada = dataRetirada;
         this.dataDevolucao = dataDevolucao;
+        this.locatario = locatario;
         this.livros = livros;
-        this.locatarios = locatarios;
     }
+
+    protected Aluguel() {}
+
+    public Long getId() { return id; }
 
     public LocalDate getDataRetirada() {
         return dataRetirada;
@@ -32,7 +58,7 @@ public class Aluguel {
         this.dataDevolucao = dataDevolucao;
     }
 
-    public ArrayList<Livro> getLivros() {
+    public List<Livro> getLivros() {
         return livros;
     }
 
@@ -40,11 +66,4 @@ public class Aluguel {
         this.livros = livros;
     }
 
-    public ArrayList<Locatario> getLocatarios() {
-        return locatarios;
-    }
-
-    public void setLocatarios(ArrayList<Locatario> locatarios) {
-        this.locatarios = locatarios;
-    }
 }

@@ -25,6 +25,9 @@ public class Livro {
     )
     private List<Autor> autores = new ArrayList<>();
 
+    @ManyToMany(mappedBy = "livros")
+    private List<Aluguel> alugueis = new ArrayList<>();
+
     protected Livro() {
     }
 
@@ -64,6 +67,10 @@ public class Livro {
 
     public void setDataDePublicacao(LocalDate dataDePublicacao) {
         this.dataDePublicacao = dataDePublicacao;
+    }
+
+    public List<Aluguel> getAlugueis() {
+        return alugueis;
     }
 
 

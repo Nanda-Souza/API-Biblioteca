@@ -335,8 +335,56 @@ public class AluguelServiceTest {
         verify(locatarioRepository, times(1)).findById(1L);
     }
 
+    @Test
+    @DisplayName("Deve deletar aluguel com sucesso!")
+    void deveDeletarAluguelComSucesso() {
 
+        Long aluguelId = 1L;
 
+        Locatario locatario = new Locatario(
+                "Ana Paula Souza Oliveira",
+                "987654321",
+                "ana.souza.oliveira@email.com",
+                LocalDate.parse("1990-05-12"),
+                "12345678901"
+        );
+
+        Livro livro = new Livro(
+                "Capitães da Areia",
+                "9788535914849",
+                LocalDate.parse("1937-01-01")
+        );
+
+        Aluguel aluguel = new Aluguel(locatario, List.of(livro));
+
+        when(aluguelRepository.findById(aluguelId))
+                .thenReturn(Optional.of(aluguel));
+
+        aluguelService.deletarAluguel(aluguelId);
+
+        verify(aluguelRepository, times(1)).findById(aluguelId);
+        verify(aluguelRepository, times(1)).delete(aluguel);
+    }
+
+    @Test
+    @DisplayName("Não deve deletar aluguel quando ele não existir!")
+    void naoDeveDeletarAluguelQuandoNaoExiste() {
+
+        Long aluguelId = 1L;
+
+        when(aluguelRepository.findById(aluguelId))
+                .thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> aluguelService.deletarAluguel(aluguelId)
+        );
+
+        assertEquals("Aluguel com id " + aluguelId + " não encontrado!", exception.getMessage(),"Deve retornar aluguel com id 1 não encontrado!");
+
+        verify(aluguelRepository, times(1)).findById(aluguelId);
+        verify(aluguelRepository, never()).delete(any());
+    }
 
 
 }

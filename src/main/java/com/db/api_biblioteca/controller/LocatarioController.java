@@ -40,4 +40,10 @@ public class LocatarioController {
         return ResponseEntity.ok(locatarioService.atualizarLocatario(id, locatarioRequest));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluirLocatario(@PathVariable Long id) {
+        locatarioService.deletarLocatario(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

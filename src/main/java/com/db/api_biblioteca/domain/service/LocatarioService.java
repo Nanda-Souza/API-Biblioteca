@@ -157,5 +157,14 @@ public class LocatarioService {
         );
     }
 
+    public void deletarLocatario(Long id) {
+
+        Locatario locatario = locatarioRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Locatário com Id " + id + " não encontrado!"));
+
+        locatarioRepository.delete(locatario);
+    }
+
 
 }

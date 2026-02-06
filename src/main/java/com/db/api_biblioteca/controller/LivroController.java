@@ -24,6 +24,7 @@ public class LivroController {
 
     @GetMapping
     public ResponseEntity<List<LivroResponse>> listarLivros() {
+
         return ResponseEntity.ok(livroService.listarLivros());
     }
 

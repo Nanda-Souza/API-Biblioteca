@@ -348,5 +348,50 @@ public class LocatarioServiceTest {
         verify(locatarioRepository, never()).save(any());
     }
 
+    @Test
+    @DisplayName("Deve deletar locatárop com sucesso!")
+    void deveDeletarLocatarioComSucesso() {
+
+        Long id = 1L;
+
+        Locatario locatario = new Locatario(
+                "Ana",
+                "993569926",
+                "ana@gmail.com",
+                LocalDate.parse("1990-05-05"),
+                "12345678900"
+
+        );
+
+        when(locatarioRepository.findById(id))
+                .thenReturn(Optional.of(locatario));
+
+        locatarioService.deletarLocatario(id);
+
+        verify(locatarioRepository).findById(id);
+        verify(locatarioRepository).delete(locatario);
+
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao tentar deletar locatário inexistente!")
+    void deveLancarExcecaoAoDeletarLocatarioInexistente() {
+
+        Long id = 1L;
+
+        when(locatarioRepository.findById(id))
+                .thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> locatarioService.deletarLocatario(id)
+        );
+
+        assertEquals("Locatário com Id 1 não encontrado!",exception.getMessage(), "Deve retornar locatário com id 1 não encontrado!");
+
+        verify(locatarioRepository).findById(id);
+        verify(locatarioRepository, never()).delete(any());
+    }
+
 
 }

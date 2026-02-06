@@ -91,7 +91,7 @@ public class LivroServiceTest {
                 () -> livroService.salvarLivro(request)
         );
 
-        assertEquals("Um ou mais autores não encontrados!", exception.getMessage(),"Deve retornar erro quando nem todos os autores existirem!");
+        assertEquals("Um ou mais autores não foram encontrados!", exception.getMessage(),"Deve retornar erro quando nem todos os autores existirem!");
 
         verify(livroRepository, never()).save(any(Livro.class));
     }

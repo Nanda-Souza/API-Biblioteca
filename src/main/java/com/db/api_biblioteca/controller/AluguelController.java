@@ -1,12 +1,12 @@
 package com.db.api_biblioteca.controller;
 
+import com.db.api_biblioteca.domain.dto.AluguelRequest;
 import com.db.api_biblioteca.domain.dto.AluguelResponse;
 import com.db.api_biblioteca.domain.service.AluguelService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,6 +22,12 @@ public class AluguelController {
     public ResponseEntity<List<AluguelResponse>> listarAlugueis() {
 
         return ResponseEntity.ok(aluguelService.listarAlugueis());
+    }
+
+    @PostMapping
+    public ResponseEntity<AluguelResponse> salvarAluguel(
+            @RequestBody @Valid AluguelRequest aluguelRequest) {
+        return ResponseEntity.ok(aluguelService.salvarAluguel(aluguelRequest));
     }
 
 }

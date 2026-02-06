@@ -57,7 +57,7 @@ public class LivroService {
         List<Autor> autores = autorRepository.findAllById(livroRequest.autoresIds());
 
         if (autores.size() != livroRequest.autoresIds().size()) {
-            throw new IllegalArgumentException("Um ou mais autores não encontrados!");
+            throw new IllegalArgumentException("Um ou mais autores não foram encontrados!");
         }
 
         Livro livro = new Livro(

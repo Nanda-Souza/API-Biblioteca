@@ -15,7 +15,7 @@ public class Locatario {
     private Long id;
 
     private String nome;
-    private String Sexo;
+    private String sexo;
     private String telefone;
 
     @Column(name = "EMAIL", unique = true, nullable = false)
@@ -52,11 +52,11 @@ public class Locatario {
     }
 
     public String getSexo() {
-        return Sexo;
+        return sexo;
     }
 
     public void setSexo(String sexo) {
-        Sexo = sexo;
+        this.sexo = sexo;
     }
 
     public String getTelefone() {

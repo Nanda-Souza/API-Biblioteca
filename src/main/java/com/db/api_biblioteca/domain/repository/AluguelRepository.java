@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface AluguelRepository extends JpaRepository<Aluguel, Long> {
     boolean existsByLivros_Id(Long livroId);
     boolean existsByLocatario_Id(Long locatarioId);
+    boolean existsByLivrosIdIn(List<Long> livrosIds);
 
     @Query("""
     SELECT DISTINCT l.id

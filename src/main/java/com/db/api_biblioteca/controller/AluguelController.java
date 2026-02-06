@@ -2,6 +2,7 @@ package com.db.api_biblioteca.controller;
 
 import com.db.api_biblioteca.domain.dto.AluguelRequest;
 import com.db.api_biblioteca.domain.dto.AluguelResponse;
+import com.db.api_biblioteca.domain.dto.AluguelUpdateRequest;
 import com.db.api_biblioteca.domain.dto.LivroResponse;
 import com.db.api_biblioteca.domain.service.AluguelService;
 import jakarta.validation.Valid;
@@ -52,6 +53,14 @@ public class AluguelController {
     public ResponseEntity<Void> excluirAluguel(@PathVariable Long id) {
         aluguelService.deletarAluguel(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<AluguelResponse> atualizarAluguel(
+            @PathVariable Long id,
+            @RequestBody @Valid AluguelUpdateRequest aluguelRequest
+    ){
+        return ResponseEntity.ok(aluguelService.atualizarAluguel(id, aluguelRequest));
     }
 
 

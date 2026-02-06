@@ -67,4 +67,6 @@ public class Aluguel {
 
     public Locatario getLocatario() { return locatario; }
 
+    public void setLocatario(Locatario locatario) {}
+
 }

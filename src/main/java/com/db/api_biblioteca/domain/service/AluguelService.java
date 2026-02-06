@@ -2,6 +2,7 @@ package com.db.api_biblioteca.domain.service;
 
 import com.db.api_biblioteca.domain.dto.AluguelRequest;
 import com.db.api_biblioteca.domain.dto.AluguelResponse;
+import com.db.api_biblioteca.domain.dto.AluguelUpdateRequest;
 import com.db.api_biblioteca.domain.dto.LivroResponse;
 import com.db.api_biblioteca.domain.entity.Aluguel;
 import com.db.api_biblioteca.domain.entity.Autor;
@@ -10,10 +11,9 @@ import com.db.api_biblioteca.domain.entity.Locatario;
 import com.db.api_biblioteca.domain.repository.AluguelRepository;
 import com.db.api_biblioteca.domain.repository.LivroRepository;
 import com.db.api_biblioteca.domain.repository.LocatarioRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AluguelService {
@@ -56,6 +56,10 @@ public class AluguelService {
 
         if (livros.size() != aluguelRequest.livrosIds().size()) {
             throw new RuntimeException("Um ou mais livros não foram encontrados!");
+        }
+
+        if (aluguelRepository.existsByLivrosIdIn(aluguelRequest.livrosIds())) {
+            throw new RuntimeException("Um ou mais livros estão alugados!");
         }
 
         Aluguel aluguel = new Aluguel(locatario, livros);
@@ -148,10 +152,65 @@ public class AluguelService {
         aluguelRepository.delete(aluguel);
     }
 
+    public AluguelResponse atualizarAluguel(Long aluguelId, AluguelUpdateRequest aluguelUpdate){
 
+        Aluguel aluguel = aluguelRepository.findById(aluguelId)
+                .orElseThrow(() ->
+                        new RuntimeException("Aluguel com id " + aluguelId + " não encontrado!")
+                );
 
+        if(aluguelUpdate.locatarioId() != null){
+           Locatario novoLocatario = locatarioRepository.findById(aluguelUpdate.locatarioId())
+                   .orElseThrow(() ->
+                           new RuntimeException("Locatario com id " + aluguelUpdate.locatarioId() + " não encontrado!")
+                   );
 
+            Locatario locatarioAntigo = aluguel.getLocatario();
 
+            if (locatarioAntigo != null) {
+                System.out.println(locatarioAntigo.getNome());
+                locatarioAntigo.getAlugueis().remove(aluguel);
+            }
+
+            aluguel.setLocatario(novoLocatario);
+            System.out.println(novoLocatario.getNome());
+
+            novoLocatario.getAlugueis().add(aluguel);
+       }
+
+        if(aluguelUpdate.livrosIds() != null){
+            List<Livro> livros = livroRepository.findAllById(aluguelUpdate.livrosIds());
+
+            if (aluguelUpdate.livrosIds().isEmpty()) {
+                throw new RuntimeException("O aluguel deve possuir ao menos um livro!");
+            }
+
+            if (livros.size() != aluguelUpdate.livrosIds().size()) {
+                throw new RuntimeException("Um ou mais livros não foram encontrados!");
+            }
+
+            if (aluguelRepository.existsByLivrosIdIn(aluguelUpdate.livrosIds())) {
+                throw new RuntimeException("Um ou mais livros estão alugados!");
+            }
+
+            aluguel.setLivros(livros);
+
+        }
+
+        Aluguel aluguelAtualizado = aluguelRepository.save(aluguel);
+
+        return new AluguelResponse(
+                aluguelAtualizado.getId(),
+                aluguelAtualizado.getDataRetirada().toString(),
+                aluguelAtualizado.getDataDevolucao().toString(),
+                aluguelAtualizado.getLocatario().getId(),
+                aluguelAtualizado.getLivros()
+                        .stream()
+                        .map(Livro::getId)
+                        .toList()
+        );
+
+    }
 
 
 

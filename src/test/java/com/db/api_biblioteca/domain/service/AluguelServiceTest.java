@@ -2,6 +2,7 @@ package com.db.api_biblioteca.domain.service;
 
 import com.db.api_biblioteca.domain.dto.AluguelRequest;
 import com.db.api_biblioteca.domain.dto.AluguelResponse;
+import com.db.api_biblioteca.domain.dto.AluguelUpdateRequest;
 import com.db.api_biblioteca.domain.dto.LivroResponse;
 import com.db.api_biblioteca.domain.entity.Aluguel;
 import com.db.api_biblioteca.domain.entity.Livro;
@@ -257,8 +258,8 @@ public class AluguelServiceTest {
 
         Locatario locatario = new Locatario(
                 "Ana Paula",
-                "999999999",
-                "ana@email.com",
+                "987654321",
+                "ana.souza.oliveira.@email.com",
                 LocalDate.parse("1990-05-12"),
                 "12345678901"
         );
@@ -297,8 +298,8 @@ public class AluguelServiceTest {
 
         Locatario locatario = new Locatario(
                 "Ana Paula",
-                "999999999",
-                "ana@email.com",
+                "987654321",
+                "ana.souza.oliveira.@email.com",
                 LocalDate.parse("1990-05-12"),
                 "12345678901"
         );
@@ -385,6 +386,210 @@ public class AluguelServiceTest {
         verify(aluguelRepository, times(1)).findById(aluguelId);
         verify(aluguelRepository, never()).delete(any());
     }
+
+    @Test
+    @DisplayName("Deve atualizar o locatário do aluguel com sucesso!")
+    void deveAtualizarLocatarioDoAluguelComSucesso() {
+
+        Locatario locatarioAntigo = new Locatario(
+                "Ana Paula",
+                "987654321",
+                "ana.souza.oliveira.@email.com",
+                LocalDate.parse("1990-05-12"),
+                "12345678901"
+        );
+        setId(locatarioAntigo, 1L);
+
+        Locatario novoLocatario = new Locatario(
+                "Carlos Eduardo",
+                "888888888",
+                "carlos@email.com",
+                LocalDate.parse("1985-03-20"),
+                "98765432100"
+        );
+        setId(novoLocatario, 2L);
+
+        Livro livro = new Livro(
+                "Capitães da Areia",
+                "9788535914849",
+                LocalDate.parse("1937-01-01")
+        );
+
+        Aluguel aluguel = new Aluguel(locatarioAntigo, List.of(livro));
+        setId(aluguel, 4L);
+
+        AluguelUpdateRequest request =
+                new AluguelUpdateRequest(2L, null);
+
+        when(aluguelRepository.findById(4L))
+                .thenReturn(Optional.of(aluguel));
+
+        when(locatarioRepository.findById(2L))
+                .thenReturn(Optional.of(novoLocatario));
+
+        when(aluguelRepository.save(any(Aluguel.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        AluguelResponse response =
+                aluguelService.atualizarAluguel(4L, request);
+
+        assertEquals(2L, response.locatarioId(), "Deve atualizar o locatário!");
+        verify(aluguelRepository, times(1)).save(aluguel);
+    }
+
+    @Test
+    @DisplayName("Deve atualizar os livros do aluguel com sucesso!")
+    void deveAtualizarLivrosDoAluguelComSucesso() {
+
+        Locatario locatario = new Locatario(
+                "Ana Paula",
+                "987654321",
+                "ana.souza.oliveira.@email.com",
+                LocalDate.parse("1990-05-12"),
+                "12345678901"
+        );
+        setId(locatario, 1L);
+
+        Livro livro = new Livro(
+                "Capitães da Areia",
+                "9788535914849",
+                LocalDate.parse("1937-01-01")
+        );
+
+        Livro livroNovo = new Livro(
+                "Perto do Coração Selvagem",
+                "9788535920413",
+                LocalDate.parse("1943-01-01")
+        );
+        setId(livroNovo, 2L);
+
+        Aluguel aluguel = new Aluguel(locatario, List.of(livro));
+        setId(aluguel, 1L);
+
+        AluguelUpdateRequest request =
+                new AluguelUpdateRequest(null, List.of(2L));
+
+        when(aluguelRepository.findById(1L))
+                .thenReturn(Optional.of(aluguel));
+
+        when(livroRepository.findAllById(List.of(2L)))
+                .thenReturn(List.of(livroNovo));
+
+        when(aluguelRepository.existsByLivrosIdIn(List.of(2L)))
+                .thenReturn(false);
+
+        when(aluguelRepository.save(any(Aluguel.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        AluguelResponse response =
+                aluguelService.atualizarAluguel(1L, request);
+
+        assertEquals(1, response.livrosIds().size(), "Deve retornar uma lista um livro!");
+        assertEquals(2L, response.livrosIds().get(0), "Deve retornar uma lista com o id 2!");
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro quando aluguel não for encontrado!")
+    void deveLancarErroQuandoAluguelNaoExistir() {
+
+        AluguelUpdateRequest request =
+                new AluguelUpdateRequest(1L, null);
+
+        when(aluguelRepository.findById(1L))
+                .thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> aluguelService.atualizarAluguel(1L, request)
+        );
+
+        assertEquals("Aluguel com id 1 não encontrado!",exception.getMessage(), "Deve retornar aluguel com id 1 não encontrado!");
+
+        verify(aluguelRepository, times(1)).findById(1L);
+        verify(aluguelRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro quando novo locatário não existir!")
+    void deveLancarErroQuandoNovoLocatarioNaoExistir() {
+
+        Locatario locatario = new Locatario(
+                "Ana Paula",
+                "987654321",
+                "ana.souza.oliveira.@email.com",
+                LocalDate.parse("1990-05-12"),
+                "12345678901"
+        );
+
+        Livro livro = new Livro(
+                "Capitães da Areia",
+                "9788535914849",
+                LocalDate.parse("1937-01-01")
+        );
+
+        Aluguel aluguel = new Aluguel(locatario, List.of(livro));
+
+        AluguelUpdateRequest request =
+                new AluguelUpdateRequest(1L, null);
+
+        when(aluguelRepository.findById(1L))
+                .thenReturn(Optional.of(aluguel));
+
+        when(locatarioRepository.findById(1L))
+                .thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> aluguelService.atualizarAluguel(1L, request)
+        );
+
+        assertEquals("Locatario com id 1 não encontrado!", exception.getMessage(), "Deve retornar locatário com id 1 não encontrado!");
+
+        verify(aluguelRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro quando lista de livros estiver vazia!")
+    void deveLancarErroQuandoListaDeLivrosEstiverVazia() {
+
+        Locatario locatario = new Locatario(
+                "Ana Paula",
+                "987654321",
+                "ana.souza.oliveira.@email.com",
+                LocalDate.parse("1990-05-12"),
+                "12345678901"
+        );
+
+        Livro livro = new Livro(
+                "Capitães da Areia",
+                "9788535914849",
+                LocalDate.parse("1937-01-01")
+        );
+
+        Aluguel aluguel = new Aluguel(locatario, List.of(livro));
+
+        AluguelUpdateRequest request =
+                new AluguelUpdateRequest(null, List.of());
+
+        when(aluguelRepository.findById(1L))
+                .thenReturn(Optional.of(aluguel));
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> aluguelService.atualizarAluguel(1L, request)
+        );
+
+        assertEquals("O aluguel deve possuir ao menos um livro!",exception.getMessage(), "Deve retornar que o aluguel deve possuir um ou mais livros!");
+
+        verify(aluguelRepository, never()).save(any());
+    }
+
+
+
+
+
+
+
 
 
 }

@@ -165,17 +165,7 @@ public class AluguelService {
                            new RuntimeException("Locatario com id " + aluguelUpdate.locatarioId() + " não encontrado!")
                    );
 
-            Locatario locatarioAntigo = aluguel.getLocatario();
-
-            if (locatarioAntigo != null) {
-                System.out.println(locatarioAntigo.getNome());
-                locatarioAntigo.getAlugueis().remove(aluguel);
-            }
-
             aluguel.setLocatario(novoLocatario);
-            System.out.println(novoLocatario.getNome());
-
-            novoLocatario.getAlugueis().add(aluguel);
        }
 
         if(aluguelUpdate.livrosIds() != null){

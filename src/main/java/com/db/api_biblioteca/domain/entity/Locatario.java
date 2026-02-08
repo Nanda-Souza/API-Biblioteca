@@ -94,4 +94,6 @@ public class Locatario {
     public List<Aluguel> getAlugueis() {
         return alugueis;
     }
+
+
 }
